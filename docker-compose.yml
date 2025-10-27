@@ -1,0 +1,59 @@
+version: "3.8"
+
+services:
+  # Backend Django service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: dialogue_map_backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=False
+      - DATABASE_URL=${DATABASE_URL}
+      - SECRET_KEY=${SECRET_KEY}
+      - ALLOWED_HOSTS=localhost,127.0.0.1,backend
+      - CORS_ALLOWED_ORIGINS=http://localhost,http://localhost:3000,http://localhost:5173
+    volumes:
+      - ./backend:/app
+      - backend_static:/app/staticfiles
+      - backend_media:/app/media
+    depends_on:
+      - db
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py seed_data &&
+             gunicorn config.wsgi:application --bind 0.0.0.0:8000 --reload"
+
+  # Frontend React service
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: dialogue_map_frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    environment:
+      - VITE_API_URL=http://localhost:8000/api
+
+  # PostgreSQL database (for local development)
+  # In production, use Neon Postgres instead
+  db:
+    image: postgres:15-alpine
+    container_name: dialogue_map_db
+    environment:
+      - POSTGRES_DB=dialogue_map
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+  backend_static:
+  backend_media:
