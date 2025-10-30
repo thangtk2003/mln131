@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { BookOpen, Map, MessageSquare } from "lucide-react";
+import { BookOpen, Map, MessageSquare, Sparkles } from "lucide-react";
 import clsx from "clsx";
 
 /**
@@ -10,6 +10,7 @@ export default function Navbar() {
     { path: "/theory", label: "Lý thuyết Nền tảng", icon: BookOpen },
     { path: "/map", label: "Bản đồ Thực tiễn", icon: Map },
     { path: "/forum", label: "Cổng Đối thoại", icon: MessageSquare },
+    { path: "/ai-usage", label: "Phụ lục AI", icon: Sparkles },
   ];
 
   return (

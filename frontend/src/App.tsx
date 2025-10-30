@@ -5,6 +5,7 @@ import MapPage from "./pages/MapPage";
 import ForumPage from "./pages/ForumPage";
 import PostDetailPage from "./pages/PostDetailPage";
 import CreatePostPage from "./pages/CreatePostPage";
+import AIUsagePage from "./pages/AIUsagePage";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route path="/forum" element={<ForumPage />} />
           <Route path="/forum/post/:id" element={<PostDetailPage />} />
           <Route path="/forum/create" element={<CreatePostPage />} />
+          <Route path="/ai-usage" element={<AIUsagePage />} />
         </Routes>
       </Layout>
     </Router>
