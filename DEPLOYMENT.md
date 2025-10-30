@@ -60,15 +60,36 @@ postgresql://user:password@host.neon.tech/main?sslmode=require
 
 ### 2.3. Cấu hình Service
 
+**OPTION 1: Dùng build.sh (Khuyến nghị)**
+
 ```
 Name: dialogue-map-backend
 Region: Singapore
-Branch: main
+Branch: main (hoặc master)
 Root Directory: backend
 Runtime: Python 3
-Build Command: pip install -r requirements.txt
-Start Command: gunicorn config.wsgi:application --bind 0.0.0.0:$PORT
+Build Command: chmod +x build.sh && ./build.sh
+Start Command: gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 2
 ```
+
+**OPTION 2: Manual commands**
+
+```
+Name: dialogue-map-backend
+Region: Singapore
+Branch: main (hoặc master)
+Root Directory: backend
+Runtime: Python 3
+Build Command: pip install -r requirements.txt && python manage.py collectstatic --no-input && python manage.py migrate
+Start Command: gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 2
+```
+
+**⚠️ LƯU Ý QUAN TRỌNG:**
+
+- Start Command phải là: `gunicorn config.wsgi:application --bind 0.0.0.0:$PORT`
+- `config` là tên folder chứa wsgi.py trong backend
+- Nếu bạn thấy error "No module named 'your_application'", nghĩa là bạn đang dùng lệnh mặc định sai của Render
+- Phải thay đổi Start Command trong Render dashboard manually
 
 ### 2.4. Environment Variables
 
@@ -342,6 +363,19 @@ File `.github/workflows/ci-cd.yml` đã có sẵn.
 
 ## 🐛 Troubleshooting
 
+### ❌ Error: "ModuleNotFoundError: No module named 'your_application'"
+
+**Nguyên nhân:** Start Command đang dùng lệnh mặc định sai của Render
+
+**Cách sửa:**
+
+1. Vào Render Dashboard → chọn service backend
+2. Settings → Build & Deploy
+3. Tìm "Start Command"
+4. Thay đổi thành: `gunicorn config.wsgi:application --bind 0.0.0.0:$PORT`
+5. Save Changes
+6. Manual Deploy → Deploy latest commit
+
 ### Backend không start
 
 ```bash
@@ -352,6 +386,7 @@ render logs
 - Database connection failed → Check DATABASE_URL
 - Module not found → Rebuild with dependencies
 - Port binding → Check if using $PORT variable
+- Wrong wsgi path → Must be config.wsgi:application
 ```
 
 ### Frontend không load API
